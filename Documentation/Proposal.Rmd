@@ -10,7 +10,7 @@ output: html_document
 
 More and more open data is available nowadays. One example is the BRP, 'BasisRegistratie Percelen', where all the farmlands in the Netherlands are stored with their respectively crop type. Another example of open data are the spectral satellite imagery of the whole globe.
 
-Farmers in the Netherlands do in general not know how well their crop is doing compared to other fields in the region. THerefore I want to build a tool where farmers can assess their field in comparison to other fields in the region.
+Farmers in the Netherlands do in general not know how well their crop is doing compared to other fields in the region. Therefore I want to build a tool where farmers can assess their fields and compare it with other fields in the region.
 
 # Method
 
@@ -23,4 +23,7 @@ The proposed method is:
 - Rank every field based on their NDVI value in their respectively crop category.
 - Visualize the results on a webpage using Leaflet.
 
-To make this project feasonable only a small area of one municipality is used, this to simplify the project and reduce processing time.
+Most of the programming will be done in R.
+THe visualization will be done in Javascript using the Leaflet package.
+
+To make this project feasonable, only one municipality in the Netherlands is used to simplify the project and reduce processing time.

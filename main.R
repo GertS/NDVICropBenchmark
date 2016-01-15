@@ -11,11 +11,7 @@ library(sp)
 library(rgdal)
 library(rgeos)
 source('R/polygonSelection.R')
-
-# define CRS object for RD projection
-
-prj_string_RD <- CRS("+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +units=m +no_defs")
-
+source('R/fetchNDVI.R')
 
 # Load data ---------------------------------------------------------------
 
@@ -31,13 +27,27 @@ rm(adm)
 boundary <- spTransform(boundary,CRS(proj4string(parcels))) ## Transform to RDnew (EPSG:28992)
 
 
-# Extract fields partially inside boundary ---------------------------------
+# Extract fields that are largely inside boundary --------------------------
 
 parcelsOfInterest <- polygonSelection(boundary,parcels,TRUE,TRUE)
 head(parcelsOfInterest@data$CENTROID@coords)
 
 
-# plot selection method difference  ---------------------------------------
+# plot selection method difference  INTERMEZZO ------------------------------
 
 plot(polygonSelection(boundary,parcels,F,F),border='red') ## parcels at least partially inside boundary
 plot(polygonSelection(boundary,parcels,T,F),add=T) ## parcels largely inside boundary
+
+
+# Fetch NDVI values -------------------------------------------------------
+
+fetchNDVI()
+# parcelsOfInterest@data$NDVI <- mapply(c(parcelsOfInterest@data$CENTROID@coords[,'x'],parcelsOfInterest@data$CENTROID@coords[,'y']),fetchNDVI)
+# parcelsOfInterest@data$NDVI <- mapply(fetchNDVI,parcelsOfInterest@data$CENTROID@coords[,1],parcelsOfInterest@data$CENTROID@coords[,2])
+# parcelsOfInterest@data$NDVI <- tapply(parcelsOfInterest@data$CENTROID@coords[,1],parcelsOfInterest@data$CENTROID@coords[,2],fetchNDVI)
+
+lengte <- length(parcelsOfInterest)
+a <- list()
+for(i in 1:lengte){
+  append(a,list(fetchNDVI(parcelsOfInterest@data$CENTROID@coords[i,])))
+}

@@ -33,10 +33,11 @@ parcelsOfInterest <- polygonSelection(boundary,parcels,TRUE,TRUE)
 head(parcelsOfInterest@data$CENTROID@coords)
 
 
-# plot selection method difference  INTERMEZZO ------------------------------
+# plot selection method difference  INTERMEZZO ----------------------------
 
 plot(polygonSelection(boundary,parcels,F,F),border='red') ## parcels at least partially inside boundary
 plot(polygonSelection(boundary,parcels,T,F),add=T) ## parcels largely inside boundary
+plot(boundary,add=T) ## boundary
 
 
 # Fetch NDVI values -------------------------------------------------------

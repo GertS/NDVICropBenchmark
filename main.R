@@ -47,13 +47,18 @@ legend("bottomleft", title="Legend",
 
 # Fetch NDVI values -------------------------------------------------------
 
-fetchNDVI()
+# fetchNDVI()
 # parcelsOfInterest@data$NDVI <- mapply(c(parcelsOfInterest@data$CENTROID@coords[,'x'],parcelsOfInterest@data$CENTROID@coords[,'y']),fetchNDVI)
 # parcelsOfInterest@data$NDVI <- mapply(fetchNDVI,parcelsOfInterest@data$CENTROID@coords[,1],parcelsOfInterest@data$CENTROID@coords[,2])
 # parcelsOfInterest@data$NDVI <- tapply(parcelsOfInterest@data$CENTROID@coords[,1],parcelsOfInterest@data$CENTROID@coords[,2],fetchNDVI)
+NDVIFileName <- paste('Data/ndvi',adm_name,'.RData',sep = '')
+# for testing:
+# parcelsOfInterest <- parcelsOfInterest[1:10,]
 
-lengte <- length(parcelsOfInterest)
-a <- list()
-for(i in 1:lengte){
-  append(a,list(fetchNDVI(parcelsOfInterest@data$CENTROID@coords[i,])))
+if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to prevent high server load.
+  NDVI <- mapply(fetchNDVI, parcelsOfInterest@data$CENTROID@coords[,'x'], parcelsOfInterest@data$CENTROID@coords[,'y'])
+  save(NDVI,file = NDVIFileName)
+}else{
+  load(file = NDVIFileName)
 }
+parcelsOfInterest@data$NDVI <- NDVI

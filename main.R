@@ -22,7 +22,8 @@ adm <- raster::getData("GADM", country = "NLD",level = 2, path = "Data") ## Muni
 
 # Prepare administrative areas --------------------------------------------
 
-boundary <- adm[adm$NAME_2 == "Stadskanaal",]
+adm_name <- c("Stadskanaal")
+boundary <- adm[adm$NAME_2 %in% adm_name,]
 rm(adm)
 boundary <- spTransform(boundary,CRS(proj4string(parcels))) ## Transform to RDnew (EPSG:28992)
 
@@ -35,10 +36,14 @@ head(parcelsOfInterest@data$CENTROID@coords)
 
 # plot selection method difference  INTERMEZZO ----------------------------
 
-plot(polygonSelection(boundary,parcels,F,F),border='red') ## parcels at least partially inside boundary
-plot(polygonSelection(boundary,parcels,T,F),add=T) ## parcels largely inside boundary
-plot(boundary,add=T) ## boundary
-
+plot(polygonSelection(boundary,parcels,F,F),border='red',lwd=0.5) ## parcels at least partially inside boundary
+plot(polygonSelection(boundary,parcels,T,F),add=T,lwd=0.5) ## parcels largely inside boundary
+plot(boundary,add=T,border="green") ## boundary
+title(paste("Municipality of",adm_name),xlab="longitude", ylab="latitude")
+legend("bottomleft", title="Legend",
+       c("centroids outside boundary","centroids inside boundary","boundary"), 
+       lty=c(1,1,1),lwd=c(2.5,2.5,2.5),col=c("red","brown","green"),horiz = F,
+       cex = 0.75)
 
 # Fetch NDVI values -------------------------------------------------------
 

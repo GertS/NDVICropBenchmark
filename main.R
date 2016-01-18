@@ -25,6 +25,7 @@ adm <- raster::getData("GADM", country = "NLD",level = 2, path = "Data") ## Muni
 adm_name <- c("Stadskanaal")
 boundary <- adm[adm$NAME_2 %in% adm_name,]
 rm(adm)
+boundary <- gUnaryUnion(boundary) ## multi polygons to one boundary polygon
 boundary <- spTransform(boundary,CRS(proj4string(parcels))) ## Transform to RDnew (EPSG:28992)
 
 
@@ -47,15 +48,11 @@ legend("bottomleft", title="Legend",
 
 # Fetch NDVI values -------------------------------------------------------
 
-# fetchNDVI()
-# parcelsOfInterest@data$NDVI <- mapply(c(parcelsOfInterest@data$CENTROID@coords[,'x'],parcelsOfInterest@data$CENTROID@coords[,'y']),fetchNDVI)
-# parcelsOfInterest@data$NDVI <- mapply(fetchNDVI,parcelsOfInterest@data$CENTROID@coords[,1],parcelsOfInterest@data$CENTROID@coords[,2])
-# parcelsOfInterest@data$NDVI <- tapply(parcelsOfInterest@data$CENTROID@coords[,1],parcelsOfInterest@data$CENTROID@coords[,2],fetchNDVI)
-NDVIFileName <- paste('Data/ndvi',adm_name,'.RData',sep = '')
-# for testing:
+NDVIFileName <- paste('Data/ndvi',paste(adm_name,collapse=''),'.RData',sep = '')
+# for testing use a subset:
 # parcelsOfInterest <- parcelsOfInterest[1:10,]
 
-if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to prevent high server load.
+if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to prevent high server load and long waithing time
   NDVI <- mapply(fetchNDVI, parcelsOfInterest@data$CENTROID@coords[,'x'], parcelsOfInterest@data$CENTROID@coords[,'y'])
   save(NDVI,file = NDVIFileName)
 }else{

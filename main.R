@@ -49,10 +49,11 @@ legend("bottomleft", title="Legend",
 # Fetch NDVI values -------------------------------------------------------
 
 NDVIFileName <- paste('Data/ndvi',paste(adm_name,collapse=''),'.RData',sep = '')
+
 # for testing use a subset:
 # parcelsOfInterest <- parcelsOfInterest[1:10,]
 
-if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to prevent high server load and long waithing time
+if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to prevent high server load and long waiting time
   NDVI <- mapply(fetchNDVI, parcelsOfInterest@data$CENTROID@coords[,'x'], parcelsOfInterest@data$CENTROID@coords[,'y'])
   save(NDVI,file = NDVIFileName)
 }else{

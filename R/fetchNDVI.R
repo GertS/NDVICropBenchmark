@@ -10,7 +10,7 @@ domain <- 'https://boerenbunder.nl/chart/'
 
 fetchNDVI <- function (x=266051.7,y=559000.5){
   url <- paste(domain,x,'/',y,sep = '')
-  json <- fromJSON(txt=url)
+  json <- fromJSON(url)
   return(json)
 }
 

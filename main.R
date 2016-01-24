@@ -10,9 +10,10 @@ rm(list = ls())
 library(sp)
 library(rgdal)
 library(rgeos)
-library(RJSONIO)
+# library(RJSONIO)
 source('R/polygonSelection.R')
 source('R/fetchNDVI.R')
+source('R/NDVIvalidate.R')
 
 # Load data ---------------------------------------------------------------
 
@@ -52,7 +53,7 @@ legend("bottomleft", title="Legend",
 NDVIFileName <- paste('Data/ndvi',paste(adm_name,collapse=''),'.RData',sep = '')
 
 # for testing use a subset:
-# parcelsOfInterest <- parcelsOfInterest[1:10,]
+# parcelsOfInterest <- parcelsOfInterest[1:20,]
 
 if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to prevent high server load and long waiting time
   NDVI <- mapply(fetchNDVI, parcelsOfInterest@data$CENTROID@coords[,'x'], parcelsOfInterest@data$CENTROID@coords[,'y'])
@@ -81,3 +82,14 @@ top5
 sink(paste('./webpageData/boundaryStatistics',adm_name,'.json',sep = ''))
 cat(toJSON(as.data.frame(t(fieldStatisticsHA)),collapse = ''))
 sink()
+
+NDVIvalidate(NDVI,2015)
+
+# NDVI statistics ---------------------------------------------------------
+# t1 <- head(data.frame(parcelsOfInterest[,2]))
+# t1['NDVI'] <- NDVI[,]$
+# poi <- transform(poi,
+#                   rank = 
+#                     ave(poi@data$NDVI$2015-, session_id, 
+#                       FUN = function(x) rank(-x, ties.method = "first")))
+

@@ -10,6 +10,7 @@ rm(list = ls())
 library(sp)
 library(rgdal)
 library(rgeos)
+library(RJSONIO)
 source('R/polygonSelection.R')
 source('R/fetchNDVI.R')
 
@@ -59,4 +60,24 @@ if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to preven
 }else{
   load(file = NDVIFileName)
 }
+
 parcelsOfInterest@data$NDVI <- NDVI
+
+
+# Interesting area statistics ---------------------------------------------
+
+# top crop types:
+fieldStatisticsHA <- aggregate(parcelsOfInterest@data$GEOMETRIE_Area, by=list(CropType=parcelsOfInterest@data$GWS_GEWAS), FUN=sum)
+fieldStatisticsHA <-fieldStatisticsHA[order(-fieldStatisticsHA$x),]
+
+#print top crop types:
+top5 <- head(fieldStatisticsHA[1],n=5)
+top5[2] <- head(fieldStatisticsHA[2]/10000,n=5)
+names(top5) <- c('croptype','Hectares')
+paste('The top 5 crops in',adm_name,'are:')
+top5
+
+#store it as json to webpage:
+sink(paste('./webpageData/boundaryStatistics',adm_name,'.json',sep = ''))
+cat(toJSON(as.data.frame(t(fieldStatisticsHA)),collapse = ''))
+sink()

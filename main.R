@@ -10,15 +10,18 @@ rm(list = ls())
 library(sp)
 library(rgdal)
 library(rgeos)
-# library(RJSONIO)
+library(data.table)
+library(plyr)
+library(leafletR)
 source('R/polygonSelection.R')
 source('R/fetchNDVI.R')
 source('R/NDVIvalidate.R')
+source('R/rankFields.R')
 
 # Load data ---------------------------------------------------------------
 
 untar("Data/BRP_Subset_ZOGron.geojson.tar.gz",exdir="Data")
-parcels = readOGR("Data/BRP_Subset_ZOGron.geojson", "OGRGeoJSON") ## loaded, around 140 MB
+parcels = readOGR("Data/BRP_Subset_ZOGron.geojson", "OGRGeoJSON") ## when loaded around 140 MB
 adm <- raster::getData("GADM", country = "NLD",level = 2, path = "Data") ## Municipalities of the Netherlands
 
 
@@ -33,7 +36,7 @@ boundary <- spTransform(boundary,CRS(proj4string(parcels))) ## Transform to RDne
 
 # Extract fields that are largely inside boundary --------------------------
 
-parcelsOfInterest <- polygonSelection(boundary,parcels,TRUE,TRUE)
+parcelsOfInterest <- polygonSelection(boundary,parcels,is.centroidInside = TRUE,returnCentroids = FALSE)
 head(parcelsOfInterest@data$CENTROID@coords)
 
 
@@ -62,8 +65,13 @@ if (!file.exists(NDVIFileName)){ ##Fetch only when not already loaded, to preven
   load(file = NDVIFileName)
 }
 
-parcelsOfInterest@data$NDVI <- NDVI
+# all NDVI dates which are available on all parcels
+NDVI <- NDVIvalidate(NDVI,2015)
 
+NDVItable <- as.data.table(NDVI)
+NDVItable <- t(NDVItable)
+dates <- names(NDVI[[1]])
+# parcelsOfInterest$NDVI <- unname(NDVI)
 
 # Interesting area statistics ---------------------------------------------
 
@@ -78,18 +86,27 @@ names(top5) <- c('croptype','Hectares')
 paste('The top 5 crops in',adm_name,'are:')
 top5
 
-#store it as json to webpage:
+#store it as json to be used in the webpage:
 sink(paste('./webpageData/boundaryStatistics',adm_name,'.json',sep = ''))
 cat(toJSON(as.data.frame(t(fieldStatisticsHA)),collapse = ''))
 sink()
 
-NDVIvalidate(NDVI,2015)
-
 # NDVI statistics ---------------------------------------------------------
-# t1 <- head(data.frame(parcelsOfInterest[,2]))
-# t1['NDVI'] <- NDVI[,]$
-# poi <- transform(poi,
-#                   rank = 
-#                     ave(poi@data$NDVI$2015-, session_id, 
-#                       FUN = function(x) rank(-x, ties.method = "first")))
+cropTable <- parcelsOfInterest$GWS_GEWAS
+fieldRanks <- rankFields(cropTable,NDVItable)
+colnames(fieldRanks) <- dates
+rownames(fieldRanks) <- c(1:nrow(fieldRanks))
 
+#store it as json to be used in the webpage:
+sink(paste('./webpageData/ranks',adm_name,'.json',sep = ''))
+cat(toJSON(as.data.frame(fieldRanks)))
+sink()
+
+# export Spatial data fram ------------------------------------------------
+
+parcelsOfInterest$id <- c(1:nrow(fieldRanks))
+toGeoJSON(parcelsOfInterest,paste('./webpageData/parcels',adm_name,sep = ""))
+
+##TODO:
+# check CRS
+# check id

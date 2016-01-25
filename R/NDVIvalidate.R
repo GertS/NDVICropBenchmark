@@ -35,7 +35,7 @@ NDVIvalidate <- function(NDVI,year){
 }
 
 popInvalidDates <- function(NDVI,dates){
-  t1 <- unname(NDVI[1:3])
+  t1 <- unname(NDVI)
   t1l<- length(t1)
   t2 <- c()
   for (i in 1:t1l){

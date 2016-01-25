@@ -10,19 +10,19 @@
 rankFields <- function(cropTable,NDVItable){
   cropTypes <- unique(cropTable)
   cropTypesl<- length(cropTypes)
-  NDVItablel<- ncol(NDVItable)
-  rankMatrix <- matrix(,nrow = length(cropTable),ncol = ncol(NDVItable))
-  for (i in 1:cropTypesl){
-    for (j in 1:NDVItablel){
-      if (sum(cropTable == cropTypes[i])==1){
+  NDVItablel<- ncol(NDVItable) 
+  rankMatrix <- matrix(,nrow = length(cropTable),ncol = ncol(NDVItable)) ## initiate matrix
+  for (i in 1:cropTypesl){    ## for every croptype do:
+    for (j in 1:NDVItablel){  ## for every date do:
+      if (sum(cropTable == cropTypes[i])==1){ ## a catch for crops that occure just once
         tempNDVItable <- NDVItable[cropTable == cropTypes[i],][j]
         fieldIndex <- which(cropTable == cropTypes[i])
         rankMatrix[fieldIndex,j] <- 1
       }else{
-        tempNDVItable <- NDVItable[cropTable == cropTypes[i],][,j]
-        fieldIndex <- as.integer(unlist(strsplit(names(tempNDVItable),"V"))[c(FALSE,TRUE)])
-        tempRank <- rank(unname(unlist(tempNDVItable)),ties.method="first")/length(tempNDVItable)
-        rankMatrix[fieldIndex,j] <- tempRank
+        tempNDVItable <- NDVItable[cropTable == cropTypes[i],][,j] ## a table with the relevant ndvi values of the i-th croptype and date j
+        fieldIndex <- which(cropTable == cropTypes[i],) ## the indices of the fields with the i-th croptype
+        tempRank <- rank(unname(unlist(tempNDVItable)),ties.method="first")/length(tempNDVItable) ## the ranks divided by the total amount of the i-th croptype
+        rankMatrix[fieldIndex,j] <- tempRank ## store into the matrix
       }
     }
   }

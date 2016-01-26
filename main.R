@@ -12,7 +12,7 @@ library(rgdal)
 library(rgeos)
 library(data.table)
 library(plyr)
-library(leafletR)
+# library(leafletR)
 source('R/polygonSelection.R')
 source('R/fetchNDVI.R')
 source('R/NDVIvalidate.R')
@@ -105,8 +105,19 @@ sink()
 # export Spatial data fram ------------------------------------------------
 
 parcelsOfInterest$id <- c(1:nrow(fieldRanks))
-toGeoJSON(parcelsOfInterest,paste('./webpageData/parcels',adm_name,sep = ""))
+# toGeoJSON(parcelsOfInterest,paste('./webpageData/parcels',adm_name,sep = ""))
+exportFileName <- paste('./webpageData/parcels',adm_name,sep = "")
 
-##TODO:
-# check CRS
-# check id
+#Remove file before creating one
+if (file.exists(exportFileName)){ 
+  system(paste("rm",exportFileName))
+}
+
+#write File
+writeOGR(parcelsOfInterest,exportFileName,layer="parcels",driver = "GeoJSON")
+#add CRS EPSG:28992 (RDnew)
+command <- paste("ogr2ogr -f GeoJSON  -s_srs EPSG:28992 -t_srs EPSG:28992 ",exportFileName,".GeoJSON"," ",exportFileName,sep="")
+system(command)
+#generate WGS84 file
+command <- paste("ogr2ogr -f GeoJSON  -s_srs EPSG:28992 -t_srs EPSG:4326 ",exportFileName,"WGS84.GeoJSON"," ",exportFileName,".GeoJSON",sep="")
+system(command)

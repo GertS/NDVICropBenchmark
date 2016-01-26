@@ -106,13 +106,18 @@ sink()
 
 parcelsOfInterest$id <- c(1:nrow(fieldRanks))
 # toGeoJSON(parcelsOfInterest,paste('./webpageData/parcels',adm_name,sep = ""))
-exportFileName <- paste('./webpageData/parcels',adm_name,sep = "")
+exportFileName        <- paste('./webpageData/parcels',adm_name,sep = "")
+exportFileNameGeoJson <- paste(exportFileName,".GeoJSON",sep = "")
+exportFileNameWGS84   <- paste(exportFileName,"WGS84.GeoJSON",sep="")
+files <- c(exportFileName,exportFileNameGeoJson,exportFileNameWGS84)
 
 #Remove file before creating one
-if (file.exists(exportFileName)){ 
-  system(paste("rm",exportFileName))
+for (i in 1:3){
+  if (file.exists(files[i])){ 
+    system(paste("rm",files[i]))
+  }
 }
-
+  
 #write File
 writeOGR(parcelsOfInterest,exportFileName,layer="parcels",driver = "GeoJSON")
 #add CRS EPSG:28992 (RDnew)

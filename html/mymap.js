@@ -9,6 +9,34 @@ $( document ).ready(function() {
     };
     map = initBaseMap(basemapNr,initLocation);
 	
+	    $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
+		
+		// alert("geojson file loaded");
+		
+		//When GeoJSON is loaded
+		var geojsonLayer = new L.GeoJSON(data,{
+		    "color": "#64FE2E",
+		    "weight": 2,
+		    "opacity": 0.4,
+			onEachFeature: onEachFeature
+		});		//New GeoJSON layer
+		map.addLayer(geojsonLayer);			//Add layer to map	
+
+	});
+
+ //    $.ajax({
+	//     type: "POST",
+	//     url: "../webpageData/parcelsStadskanaalWGS84.GeoJSON",
+	//     dataType: 'json',
+	//     success: function (response) {
+	//         geojsonLayer = L.geoJson(response).addTo(map);
+	//         map.fitBounds(geojsonLayer.getBounds());
+	//     }
+	// });
+
+	// L.geoJson("../webpageData/parcelsStadskanaalWGS84.GeoJSON").addTo(map);
+	// var parcelsLayer = new L.GeoJSON("../webpageData/parcelsStadskanaalWGS84.GeoJSON");
+	// parcelsLayer.addTo(map);
 	// map.on('click', function(e) {
 	// 	pass;
  //    });
@@ -60,6 +88,33 @@ function initBaseMap(basemapNr,initLocation){
 	basemap.addTo(map);
 	return map;
 }
+function onEachFeature(feature,layer){// does this feature have a property named popupContent?
+    var id = feature.properties.id;
+    var gewas = feature.properties.GWS_GEWAS;
+    var gewasL= gewas.split(",");
+    if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
+    var opp = Math.floor(feature.properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal
+	
+	// data = {
+	// 	labels:["2015-03-08", "2015-03-12", "2015-04-20", "2015-05-24", "2015-06-05", "2015-07-01" ,"2015-07-02", "2015-08-03", "2015-08-07", "2015-08-23", "2015-10-11", "2015-10-25"],
+	// 	datasets: [
+ //        {
+ //            label: "My First dataset",
+ //            fillColor: "rgba(220,220,220,0.2)",
+ //            strokeColor: "rgba(220,220,220,1)",
+ //            pointColor: "rgba(220,220,220,1)",
+ //            pointStrokeColor: "#fff",
+ //            pointHighlightFill: "#fff",
+ //            pointHighlightStroke: "rgba(220,220,220,1)",
+ //            data: [0.5275591 , 0.4625984 , 0.7047244,  0.8877953,  0.4842520,  0.5787402 , 0.6476378 , 0.4921260,  0.5807087,  0.4881890 , 0.9350394,0.9822835 ]
+ //        }]
+	// };
+
+  	layer.bindPopup(gewas+": "+opp+" ha");
+  	//TODO:
+  	//instead of this create in the area at the left of the page a chart
+}
+
 
 // spinner stuff:
 $body = $("body");

@@ -88,6 +88,62 @@ function initBaseMap(basemapNr,initLocation){
 	basemap.addTo(map);
 	return map;
 }
+Object.values = obj => Object.keys(obj).map(key => obj[key]);
+function getRankData(id){
+	ranks = fieldRanks[id];
+	labels = Object.keys(ranks);
+	datasetsData = Object.values(ranks);
+	data = {
+		labels:labels,
+		datasets: [
+        {
+            label: "My First dataset",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: datasetsData
+        }]
+	};
+	return data;
+}
+
+function whenClicked(e) {
+	// e = event
+	var properties = e.target.feature.properties;
+	var id = properties.id;
+	var gewas = properties.GWS_GEWAS;
+	var gewasL= gewas.split(",");
+	if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
+	var opp = Math.floor(properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal  
+	// You can make your ajax call declaration here
+	//$.ajax(...
+	$('#parcelInfo').html(gewas+": "+opp+" ha");
+	// console.log(gewas+": "+opp+" ha"); 
+	var ctx = $("#chartArea").get(0).getContext("2d");
+	var myNewChart = new Chart(ctx);
+	data = getRankData(properties.id);
+	// data = {
+	// 	labels:["2015-03-08", "2015-03-12", "2015-04-20", "2015-05-24", "2015-06-05", "2015-07-01" ,"2015-07-02", "2015-08-03", "2015-08-07", "2015-08-23", "2015-10-11", "2015-10-25"],
+	// 	datasets: [
+ //        {
+ //            label: "My First dataset",
+ //            fillColor: "rgba(220,220,220,0.2)",
+ //            strokeColor: "rgba(220,220,220,1)",
+ //            pointColor: "rgba(220,220,220,1)",
+ //            pointStrokeColor: "#fff",
+ //            pointHighlightFill: "#fff",
+ //            pointHighlightStroke: "rgba(220,220,220,1)",
+ //            data: [0.5275591 , 0.4625984 , 0.7047244,  0.8877953,  0.4842520,  0.5787402 , 0.6476378 , 0.4921260,  0.5807087,  0.4881890 , 0.9350394,0.9822835 ]
+ //        }]
+	// };
+	new Chart(ctx).Line(data, {
+	    bezierCurve: false
+	});
+}
+
 function onEachFeature(feature,layer){// does this feature have a property named popupContent?
     var id = feature.properties.id;
     var gewas = feature.properties.GWS_GEWAS;
@@ -109,8 +165,12 @@ function onEachFeature(feature,layer){// does this feature have a property named
  //            data: [0.5275591 , 0.4625984 , 0.7047244,  0.8877953,  0.4842520,  0.5787402 , 0.6476378 , 0.4921260,  0.5807087,  0.4881890 , 0.9350394,0.9822835 ]
  //        }]
 	// };
+    //bind click
+    layer.on({
+        click: whenClicked
+    });
+  	// layer.bindPopup(gewas+": "+opp+" ha");
 
-  	layer.bindPopup(gewas+": "+opp+" ha");
   	//TODO:
   	//instead of this create in the area at the left of the page a chart
 }

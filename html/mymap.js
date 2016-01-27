@@ -9,39 +9,21 @@ $( document ).ready(function() {
     };
     map = initBaseMap(basemapNr,initLocation);
 	
-	    $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
+
+
+
+});
+
+function loadPolygons(){
+    $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
 		
 		// alert("geojson file loaded");
 		
 		//When GeoJSON is loaded
-		var geojsonLayer = new L.GeoJSON(data,{
-		    "color": "#64FE2E",
-		    "weight": 2,
-		    "opacity": 0.4,
-			onEachFeature: onEachFeature
-		});		//New GeoJSON layer
-		map.addLayer(geojsonLayer);			//Add layer to map	
+		L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
 
-	});
-
- //    $.ajax({
-	//     type: "POST",
-	//     url: "../webpageData/parcelsStadskanaalWGS84.GeoJSON",
-	//     dataType: 'json',
-	//     success: function (response) {
-	//         geojsonLayer = L.geoJson(response).addTo(map);
-	//         map.fitBounds(geojsonLayer.getBounds());
-	//     }
-	// });
-
-	// L.geoJson("../webpageData/parcelsStadskanaalWGS84.GeoJSON").addTo(map);
-	// var parcelsLayer = new L.GeoJSON("../webpageData/parcelsStadskanaalWGS84.GeoJSON");
-	// parcelsLayer.addTo(map);
-	// map.on('click', function(e) {
-	// 	pass;
- //    });
-});
-
+	});	
+}
 
 function listAvailableBasemaps(){
 	/**
@@ -89,6 +71,7 @@ function initBaseMap(basemapNr,initLocation){
 	return map;
 }
 Object.values = obj => Object.keys(obj).map(key => obj[key]);
+
 function getRankData(id){
 	ranks = fieldRanks[id];
 	labels = Object.keys(ranks);
@@ -97,17 +80,23 @@ function getRankData(id){
 		labels:labels,
 		datasets: [
         {
-            label: "My First dataset",
-            fillColor: "rgba(220,220,220,0.2)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
+            label: "Plaats tenopzichte van andere percelen met hetzelfde gewas",
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
             pointStrokeColor: "#fff",
             pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(220,220,220,1)",
+            pointHighlightStroke: "rgba(151,187,205,1)",
             data: datasetsData
         }]
 	};
 	return data;
+}
+function getSummerRank(id){
+	ranks = fieldRanks[id]
+	length = Object.keys(ranks).length;
+	datasetsData = Object.values(ranks)	
+	return datasetsData[Math.floor(length/2)];
 }
 
 function whenClicked(e) {
@@ -124,23 +113,16 @@ function whenClicked(e) {
 	// console.log(gewas+": "+opp+" ha"); 
 	var ctx = $("#chartArea").get(0).getContext("2d");
 	var myNewChart = new Chart(ctx);
-	data = getRankData(properties.id);
-	// data = {
-	// 	labels:["2015-03-08", "2015-03-12", "2015-04-20", "2015-05-24", "2015-06-05", "2015-07-01" ,"2015-07-02", "2015-08-03", "2015-08-07", "2015-08-23", "2015-10-11", "2015-10-25"],
-	// 	datasets: [
- //        {
- //            label: "My First dataset",
- //            fillColor: "rgba(220,220,220,0.2)",
- //            strokeColor: "rgba(220,220,220,1)",
- //            pointColor: "rgba(220,220,220,1)",
- //            pointStrokeColor: "#fff",
- //            pointHighlightFill: "#fff",
- //            pointHighlightStroke: "rgba(220,220,220,1)",
- //            data: [0.5275591 , 0.4625984 , 0.7047244,  0.8877953,  0.4842520,  0.5787402 , 0.6476378 , 0.4921260,  0.5807087,  0.4881890 , 0.9350394,0.9822835 ]
- //        }]
-	// };
+	data = getRankData(properties.id-1);
 	new Chart(ctx).Line(data, {
-	    bezierCurve: false
+	    bezierCurve: true,
+	    scaleOverride: true,
+		// Number - The number of steps in a hard coded scale
+	    scaleSteps: 5,
+	    // Number - The value jump in the hard coded scale
+	    scaleStepWidth: 0.2,
+	    // Number - The scale starting value
+	    scaleStartValue: 0,
 	});
 }
 
@@ -150,35 +132,37 @@ function onEachFeature(feature,layer){// does this feature have a property named
     var gewasL= gewas.split(",");
     if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
     var opp = Math.floor(feature.properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal
-	
-	// data = {
-	// 	labels:["2015-03-08", "2015-03-12", "2015-04-20", "2015-05-24", "2015-06-05", "2015-07-01" ,"2015-07-02", "2015-08-03", "2015-08-07", "2015-08-23", "2015-10-11", "2015-10-25"],
-	// 	datasets: [
- //        {
- //            label: "My First dataset",
- //            fillColor: "rgba(220,220,220,0.2)",
- //            strokeColor: "rgba(220,220,220,1)",
- //            pointColor: "rgba(220,220,220,1)",
- //            pointStrokeColor: "#fff",
- //            pointHighlightFill: "#fff",
- //            pointHighlightStroke: "rgba(220,220,220,1)",
- //            data: [0.5275591 , 0.4625984 , 0.7047244,  0.8877953,  0.4842520,  0.5787402 , 0.6476378 , 0.4921260,  0.5807087,  0.4881890 , 0.9350394,0.9822835 ]
- //        }]
-	// };
     //bind click
     layer.on({
         click: whenClicked
     });
-  	// layer.bindPopup(gewas+": "+opp+" ha");
-
-  	//TODO:
-  	//instead of this create in the area at the left of the page a chart
+  	layer.bindPopup(gewas+": "+opp+" ha");
 }
 var fieldRanks;
 $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ranksStadskanaal.json",function(json){
 	fieldRanks = json;
+	loadPolygons();
 });
-
+//Colour scale for polygons:
+function getColor(r) {
+	// console.log(r);
+	r = parseFloat(r);
+    return r > 0.999999 ? '#1a9850':
+           r > 0.7 ? '#91cf60' :
+           r > 0.5 ? '#d9ef8b' :
+           r > 0.2 ? '#fc8d59' :
+                     '#d73027';
+}
+function style(feature) {
+    return {
+        fillColor: getColor(getSummerRank(feature.properties.id-1)),
+        weight: 1,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.4
+    };
+}
 
 
 // spinner stuff:

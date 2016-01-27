@@ -114,6 +114,11 @@ function onEachFeature(feature,layer){// does this feature have a property named
   	//TODO:
   	//instead of this create in the area at the left of the page a chart
 }
+var fieldRanks;
+$.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ranksStadskanaal.json",function(json){
+	fieldRanks = json;
+});
+
 
 
 // spinner stuff:

@@ -7,7 +7,24 @@ body {
 .map{
 	height:100%;
 	border: 2px solid black;
+	overflow: hidden;
+	background-color: black;
 }
+#wrapper{
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+    overflow: hidden; /* will contain if #first is longer than #second */
+}
+.side{
+	background-color: #DBD0B8;
+	width: 100px;
+	float: left;
+	height: 100%;
+	margin: 2px;
+	padding: 8px;
+}
+
 /* Start by setting display:none to make this hidden.
    Then we position it in relation to the viewport window
    with position:fixed. Width, height, top and left speak
@@ -34,14 +51,4 @@ body.loading {
    modal element will be visible */
 body.loading .modal {
     display: block;
-}
-.slider {
-	color: white;
-	margin: 10px;
-}
-.trigger {
-    position: absolute;
-    z-index: 1000;
-    top: 80px;
-    left: 10px;
 }

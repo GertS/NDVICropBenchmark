@@ -6,11 +6,24 @@
 		<link rel="stylesheet" href="library/leaflet.css" />
 		<link rel="stylesheet" href="mystyle.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-		<script src="library/leaflet.js"></script>
+		<script src="library/leaflet-src.js"></script>
+		<script src="library/Chart.js"></script>
+		<!-- // <script src="packages/leaflet.ajax.js"></script> -->
 		
 	</head>
 	<body>
-		<div class="map" id="map"></div>
+		<div id="wrapper">
+			<div class="side" id="side">
+				<p>Score van dit perceel tenopzichte van andere percelen met hetzelfde gewas in de gemeente Stadskanaal:</p>
+				<p>Een score van 1 betekend, het beste perceel met dit gewas</p>
+				<p>Een score van 0 betekend, het slechtst presterende perceel met dit gewas op de aangegeven datum</p>
+				<div id="parcelInfo"></div>
+				<canvas id="chartArea" width="400" height="400"></canvas>
+				<p>De kleuren in de velden geven de score aan midden in het groeiseisoen</p>
+				<!-- <p>Side info</p> -->
+			</div>
+			<div class="map" id="map"></div>
+		</div>
 		<script src="mymap.js"></script>
 		<div class="modal"><!-- Place at bottom of page --></div>
 	</body>

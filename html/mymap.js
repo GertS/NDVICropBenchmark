@@ -9,11 +9,21 @@ $( document ).ready(function() {
     };
     map = initBaseMap(basemapNr,initLocation);
 	
-	// map.on('click', function(e) {
-	// 	pass;
- //    });
+
+
+
 });
 
+function loadPolygons(){
+    $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
+		
+		// alert("geojson file loaded");
+		
+		//When GeoJSON is loaded
+		L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
+
+	});	
+}
 
 function listAvailableBasemaps(){
 	/**
@@ -60,6 +70,100 @@ function initBaseMap(basemapNr,initLocation){
 	basemap.addTo(map);
 	return map;
 }
+Object.values = obj => Object.keys(obj).map(key => obj[key]);
+
+function getRankData(id){
+	ranks = fieldRanks[id];
+	labels = Object.keys(ranks);
+	datasetsData = Object.values(ranks);
+	data = {
+		labels:labels,
+		datasets: [
+        {
+            label: "Plaats tenopzichte van andere percelen met hetzelfde gewas",
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: datasetsData
+        }]
+	};
+	return data;
+}
+function getSummerRank(id){
+	ranks = fieldRanks[id]
+	length = Object.keys(ranks).length;
+	datasetsData = Object.values(ranks)	
+	return datasetsData[Math.floor(length/2)];
+}
+
+function whenClicked(e) {
+	// e = event
+	var properties = e.target.feature.properties;
+	var id = properties.id;
+	var gewas = properties.GWS_GEWAS;
+	var gewasL= gewas.split(",");
+	if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
+	var opp = Math.floor(properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal  
+	// You can make your ajax call declaration here
+	//$.ajax(...
+	$('#parcelInfo').html(gewas+": "+opp+" ha");
+	// console.log(gewas+": "+opp+" ha"); 
+	var ctx = $("#chartArea").get(0).getContext("2d");
+	var myNewChart = new Chart(ctx);
+	data = getRankData(properties.id-1);
+	new Chart(ctx).Line(data, {
+	    bezierCurve: true,
+	    scaleOverride: true,
+		// Number - The number of steps in a hard coded scale
+	    scaleSteps: 5,
+	    // Number - The value jump in the hard coded scale
+	    scaleStepWidth: 0.2,
+	    // Number - The scale starting value
+	    scaleStartValue: 0,
+	});
+}
+
+function onEachFeature(feature,layer){// does this feature have a property named popupContent?
+    var id = feature.properties.id;
+    var gewas = feature.properties.GWS_GEWAS;
+    var gewasL= gewas.split(",");
+    if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
+    var opp = Math.floor(feature.properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal
+    //bind click
+    layer.on({
+        click: whenClicked
+    });
+  	layer.bindPopup(gewas+": "+opp+" ha");
+}
+var fieldRanks;
+$.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ranksStadskanaal.json",function(json){
+	fieldRanks = json;
+	loadPolygons();
+});
+//Colour scale for polygons:
+function getColor(r) {
+	// console.log(r);
+	r = parseFloat(r);
+    return r > 0.999999 ? '#1a9850':
+           r > 0.7 ? '#91cf60' :
+           r > 0.5 ? '#d9ef8b' :
+           r > 0.2 ? '#fc8d59' :
+                     '#d73027';
+}
+function style(feature) {
+    return {
+        fillColor: getColor(getSummerRank(feature.properties.id-1)),
+        weight: 1,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.4
+    };
+}
+
 
 // spinner stuff:
 $body = $("body");

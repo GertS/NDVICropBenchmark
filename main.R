@@ -12,7 +12,6 @@ library(rgdal)
 library(rgeos)
 library(data.table)
 library(plyr)
-# library(leafletR)
 source('R/polygonSelection.R')
 source('R/fetchNDVI.R')
 source('R/NDVIvalidate.R')
@@ -27,17 +26,16 @@ adm <- raster::getData("GADM", country = "NLD",level = 2, path = "Data") ## Muni
 
 # Prepare administrative areas --------------------------------------------
 
-adm_name <- c("Stadskanaal")
+adm_name <- c("Stadskanaal") ## change the municipality name to what area you want to check. (NOT the complete BRP-dataset is downloaded, only South-East Groningen)
 boundary <- adm[adm$NAME_2 %in% adm_name,]
 rm(adm)
+
 boundary <- gUnaryUnion(boundary) ## multi polygons to one boundary polygon
 boundary <- spTransform(boundary,CRS(proj4string(parcels))) ## Transform to RDnew (EPSG:28992)
-
 
 # Extract fields that are largely inside boundary --------------------------
 
 parcelsOfInterest <- polygonSelection(boundary,parcels,is.centroidInside = TRUE,returnCentroids = FALSE)
-head(parcelsOfInterest@data$CENTROID@coords)
 
 
 # plot selection method difference  INTERMEZZO ----------------------------
@@ -95,14 +93,20 @@ sink()
 cropTable <- parcelsOfInterest$GWS_GEWAS
 fieldRanks <- rankFields(cropTable,NDVItable)
 colnames(fieldRanks) <- dates
+colnames(NDVItable)  <- dates
 rownames(fieldRanks) <- c(1:nrow(fieldRanks))
+rownames(NDVItable)  <- c(1:nrow(NDVItable))
 
-#store it as json to be used in the webpage:
+#store the ranks as a json to be used in the webpage:
 sink(paste('./webpageData/ranks',adm_name,'.json',sep = ''))
 cat(toJSON(as.data.frame(fieldRanks)))
 sink()
+#store the NDVI as a json to be used in the webpage:
+sink(paste('./webpageData/ndvi',adm_name,'.json',sep = ''))
+cat(toJSON(as.data.frame(NDVItable)))
+sink()
 
-# export Spatial data fram ------------------------------------------------
+# export Spatial data frame ------------------------------------------------
 
 parcelsOfInterest$id <- c(1:nrow(fieldRanks))
 # toGeoJSON(parcelsOfInterest,paste('./webpageData/parcels',adm_name,sep = ""))

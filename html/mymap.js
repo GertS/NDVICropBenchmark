@@ -9,18 +9,16 @@ $( document ).ready(function() {
     };
     map = initBaseMap(basemapNr,initLocation);
 	
-
-
-
 });
 
+var geojson_layer;
 function loadPolygons(){
     $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
 		
 		// alert("geojson file loaded");
 		
 		//When GeoJSON is loaded
-		L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
+		geojson_layer = L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
 
 	});	
 }
@@ -70,6 +68,7 @@ function initBaseMap(basemapNr,initLocation){
 	basemap.addTo(map);
 	return map;
 }
+// To be able to check the values of a key with just using Object.values like using Object.keys
 Object.values = obj => Object.keys(obj).map(key => obj[key]);
 
 function getRankData(id){
@@ -114,7 +113,8 @@ function whenClicked(e) {
 	// e = event
 	var properties = e.target.feature.properties;
 	var id = properties.id;
-	var gewas = properties.GWS_GEWAS;
+	var gewas_original = properties.GWS_GEWAS;
+	var gewas = gewas_original;
 	var gewasL= gewas.split(",");
 	if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
 	var opp = Math.floor(properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal  
@@ -137,6 +137,24 @@ function whenClicked(e) {
 	});
 	var legend = myNewChart.generateLegend();
 	$("#legend").html(legend);
+	// Undo selection info
+	geojson_layer.eachLayer(function (layer) {    
+		layer.setStyle({
+			weight: 1,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3'}) 
+	});
+	//  highlight all fields with the same crop type
+	geojson_layer.eachLayer(function (layer) {  
+	if(layer.feature.properties.GWS_GEWAS == gewas_original) {    
+		layer.setStyle({
+			weight: 2,
+			opacity: 1,
+			color: 'darkblue',
+			dashArray: '0'}) 
+		}
+	});
 }
 
 function onEachFeature(feature,layer){// does this feature have a property named popupContent?

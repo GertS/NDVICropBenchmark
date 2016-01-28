@@ -4,31 +4,76 @@ author: |
   | Gert Sterenborg
   | gertsterenborg@gmail.com
 date: "29 January 2016"
-output: ioslides_presentation
+output:
+  ioslides_presentation:
+    incremental: true
 ---
 
-# The idea
+## Outline
+
+<div class="columns-1 centered">
+
+  - The Idea
+  - The Process
+  - The Result
+</div>
+
+# The Idea
 
 ## Boer en Bunder
+* Check the status of your farmland
+* [Boer&Bunder.nl](https://boerenbunder.nl/#b/51.98969,5.653)
 
-- Check the status of your farmland
-- [Boer&Bunder](https://boerenbunder.nl/#b/51.98969,5.653)
+## Benchmarking!
 
-## Breakfast
+- Compare your fields with others 
 
-- Eat eggs
-- Drink coffee
+## Dificulties
 
-# In the evening
+- Crop types
+- Soil types
 
-## Dinner
+# The Process
 
-- Eat spaghetti
-- Drink wine
+## BRP
+
+Basis-Registratie Percelen
+
+- Allmost all farmland in The Netherlands
+- Crop types
+
+- <p></p> <div align="center"><img class="decoded" src="BRP.png" width=400 height=300></div>
+
+## GADM
+
+Global Administrative Areas
+
+-subset per municipalit(y/ies)
+
+- <p></p> <div align="center"><img class="decoded" src="GADM.png" width=300 height=400></div>
+
+
+## Intersect
+
+<p></p> <div align="center"><img class="decoded" src="centroid1.png" width=500 height=500></div>
+
+## Intersect
+
+<p></p> <div align="center"><img class="decoded" src="Boundaries_centroids.png" width=500 height=500></div>
+
+## GADM problem
+
+<p></p> <div align="center"><img class="decoded" src="GADM-Reality.png" width=500 height=500></div>
+
+## NDVI
+
+- [Boer&Bunder.nl](https://boerenbunder.nl/#b/51.98969,5.653)
+
+## Ranking
+
+- based
 
 ----
-
-![picture of spaghetti](images/spaghetti.jpg)
 
 ## Going to sleep
 

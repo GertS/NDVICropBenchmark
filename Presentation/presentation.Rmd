@@ -1,0 +1,36 @@
+---
+title: "NDVI Benchmarking"
+author: |
+  | Gert Sterenborg
+  | gertsterenborg@gmail.com
+date: "29 January 2016"
+output: ioslides_presentation
+---
+
+# The idea
+
+## Boer en Bunder
+
+- Check the status of your farmland
+- [Boer&Bunder](https://boerenbunder.nl/#b/51.98969,5.653)
+
+## Breakfast
+
+- Eat eggs
+- Drink coffee
+
+# In the evening
+
+## Dinner
+
+- Eat spaghetti
+- Drink wine
+
+----
+
+![picture of spaghetti](images/spaghetti.jpg)
+
+## Going to sleep
+
+- Get in bed
+- Count sheep

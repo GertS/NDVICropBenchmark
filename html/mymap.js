@@ -9,18 +9,16 @@ $( document ).ready(function() {
     };
     map = initBaseMap(basemapNr,initLocation);
 	
-
-
-
 });
 
+var geojson_layer;
 function loadPolygons(){
     $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
 		
 		// alert("geojson file loaded");
 		
 		//When GeoJSON is loaded
-		L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
+		geojson_layer = L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
 
 	});	
 }
@@ -70,24 +68,36 @@ function initBaseMap(basemapNr,initLocation){
 	basemap.addTo(map);
 	return map;
 }
+// To be able to check the values of a key with just using Object.values like using Object.keys
 Object.values = obj => Object.keys(obj).map(key => obj[key]);
 
 function getRankData(id){
 	ranks = fieldRanks[id];
-	labels = Object.keys(ranks);
-	datasetsData = Object.values(ranks);
+	ndvi  = fieldNDVI[id];
+	labels= Object.keys(ranks);
+	datasetsDataRank = Object.values(ranks);
+	datasetsDataNDVI = Object.values(ndvi);
 	data = {
 		labels:labels,
 		datasets: [
         {
-            label: "Plaats tenopzichte van andere percelen met hetzelfde gewas",
+            label: "ranking",
             fillColor: "rgba(151,187,205,0.2)",
             strokeColor: "rgba(151,187,205,1)",
             pointColor: "rgba(151,187,205,1)",
             pointStrokeColor: "#fff",
             pointHighlightFill: "#fff",
             pointHighlightStroke: "rgba(151,187,205,1)",
-            data: datasetsData
+            data: datasetsDataRank
+        },{
+            label: "leaf-index",
+            fillColor: "rgba(50,126,23,0.1)",
+            strokeColor: "rgba(50,126,23,1)",
+            pointColor: "rgba(50,126,23,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(50,126,23,1)",
+            data: datasetsDataNDVI
         }]
 	};
 	return data;
@@ -103,7 +113,8 @@ function whenClicked(e) {
 	// e = event
 	var properties = e.target.feature.properties;
 	var id = properties.id;
-	var gewas = properties.GWS_GEWAS;
+	var gewas_original = properties.GWS_GEWAS;
+	var gewas = gewas_original;
 	var gewasL= gewas.split(",");
 	if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
 	var opp = Math.floor(properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal  
@@ -112,9 +123,9 @@ function whenClicked(e) {
 	$('#parcelInfo').html(gewas+": "+opp+" ha");
 	// console.log(gewas+": "+opp+" ha"); 
 	var ctx = $("#chartArea").get(0).getContext("2d");
-	var myNewChart = new Chart(ctx);
+	// new Chart(ctx);
 	data = getRankData(properties.id-1);
-	new Chart(ctx).Line(data, {
+	var myNewChart = new Chart(ctx).Line(data, {
 	    bezierCurve: true,
 	    scaleOverride: true,
 		// Number - The number of steps in a hard coded scale
@@ -123,6 +134,26 @@ function whenClicked(e) {
 	    scaleStepWidth: 0.2,
 	    // Number - The scale starting value
 	    scaleStartValue: 0,
+	});
+	var legend = myNewChart.generateLegend();
+	$("#legend").html(legend);
+	// Undo selection info
+	geojson_layer.eachLayer(function (layer) {    
+		layer.setStyle({
+			weight: 1,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3'}) 
+	});
+	//  highlight all fields with the same crop type
+	geojson_layer.eachLayer(function (layer) {  
+	if(layer.feature.properties.GWS_GEWAS == gewas_original) {    
+		layer.setStyle({
+			weight: 2,
+			opacity: 1,
+			color: 'darkblue',
+			dashArray: '0'}) 
+		}
 	});
 }
 
@@ -141,6 +172,11 @@ function onEachFeature(feature,layer){// does this feature have a property named
 var fieldRanks;
 $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ranksStadskanaal.json",function(json){
 	fieldRanks = json;
+	loadPolygons();
+});
+var fieldNDVI;
+$.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ndviStadskanaal.json",function(json){
+	fieldNDVI = json;
 	loadPolygons();
 });
 //Colour scale for polygons:

@@ -85,7 +85,11 @@ paste('The top 5 crops in',adm_name,'are:')
 top5
 
 #store it as json to be used in the webpage:
-sink(paste('./webpageData/boundaryStatistics',adm_name,'.json',sep = ''))
+file_name = paste('./webpageData/boundaryStatistics',adm_name,'.json',sep = '')
+if (file.exists(file_name)){ 
+  system(paste('rm ',file_name))
+}
+sink(file_name)
 cat(toJSON(as.data.frame(t(fieldStatisticsHA)),collapse = ''))
 sink()
 
@@ -98,11 +102,19 @@ rownames(fieldRanks) <- c(1:nrow(fieldRanks))
 rownames(NDVItable)  <- c(1:nrow(NDVItable))
 
 #store the ranks as a json to be used in the webpage:
-sink(paste('./webpageData/ranks',adm_name,'.json',sep = ''))
+file_name = paste('./webpageData/ranks',adm_name,'.json',sep = '')
+if (file.exists(file_name)){ 
+  system(paste('rm ',file_name))
+}
+sink(file_name)
 cat(toJSON(as.data.frame(fieldRanks)))
 sink()
 #store the NDVI as a json to be used in the webpage:
-sink(paste('./webpageData/ndvi',adm_name,'.json',sep = ''))
+file_name = paste('./webpageData/ndvi',adm_name,'.json',sep = '')
+if (file.exists(file_name)){ 
+  system(paste('rm ',file_name))
+}
+sink(file_name)
 cat(toJSON(as.data.frame(NDVItable)))
 sink()
 

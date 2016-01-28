@@ -74,20 +74,31 @@ Object.values = obj => Object.keys(obj).map(key => obj[key]);
 
 function getRankData(id){
 	ranks = fieldRanks[id];
-	labels = Object.keys(ranks);
-	datasetsData = Object.values(ranks);
+	ndvi  = fieldNDVI[id];
+	labels= Object.keys(ranks);
+	datasetsDataRank = Object.values(ranks);
+	datasetsDataNDVI = Object.values(ndvi);
 	data = {
 		labels:labels,
 		datasets: [
         {
-            label: "Plaats tenopzichte van andere percelen met hetzelfde gewas",
+            label: "ranking",
             fillColor: "rgba(151,187,205,0.2)",
             strokeColor: "rgba(151,187,205,1)",
             pointColor: "rgba(151,187,205,1)",
             pointStrokeColor: "#fff",
             pointHighlightFill: "#fff",
             pointHighlightStroke: "rgba(151,187,205,1)",
-            data: datasetsData
+            data: datasetsDataRank
+        },{
+            label: "leaf-index",
+            fillColor: "rgba(50,126,23,0.1)",
+            strokeColor: "rgba(50,126,23,1)",
+            pointColor: "rgba(50,126,23,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(50,126,23,1)",
+            data: datasetsDataNDVI
         }]
 	};
 	return data;
@@ -112,9 +123,9 @@ function whenClicked(e) {
 	$('#parcelInfo').html(gewas+": "+opp+" ha");
 	// console.log(gewas+": "+opp+" ha"); 
 	var ctx = $("#chartArea").get(0).getContext("2d");
-	var myNewChart = new Chart(ctx);
+	// new Chart(ctx);
 	data = getRankData(properties.id-1);
-	new Chart(ctx).Line(data, {
+	var myNewChart = new Chart(ctx).Line(data, {
 	    bezierCurve: true,
 	    scaleOverride: true,
 		// Number - The number of steps in a hard coded scale
@@ -124,6 +135,8 @@ function whenClicked(e) {
 	    // Number - The scale starting value
 	    scaleStartValue: 0,
 	});
+	var legend = myNewChart.generateLegend();
+	$("#legend").html(legend);
 }
 
 function onEachFeature(feature,layer){// does this feature have a property named popupContent?
@@ -141,6 +154,11 @@ function onEachFeature(feature,layer){// does this feature have a property named
 var fieldRanks;
 $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ranksStadskanaal.json",function(json){
 	fieldRanks = json;
+	loadPolygons();
+});
+var fieldNDVI;
+$.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ndviStadskanaal.json",function(json){
+	fieldNDVI = json;
 	loadPolygons();
 });
 //Colour scale for polygons:

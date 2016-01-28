@@ -1,22 +1,26 @@
 $( document ).ready(function() {
+	/**
+	* This will be executed when the web-page is completely loaded.
+	* It will create the basemap.
+	*/
     console.log( "ready to execute the code" );
     var basemapNr = 5;
     var initLocation = {
     	lat: 52.995687, 
     	lng: 7.037513,
-    	zoomLevel: 14, 
-
+    	zoomLevel: 14,
     };
     map = initBaseMap(basemapNr,initLocation);
 	
 });
 
+// create global geojson_layer variable:
 var geojson_layer;
 function loadPolygons(){
+	/**
+	* Downloads geojson and shows the polygons when ready.
+	*/
     $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/parcelsStadskanaalWGS84.GeoJSON", function(data) {
-		
-		// alert("geojson file loaded");
-		
 		//When GeoJSON is loaded
 		geojson_layer = L.geoJson(data, {style: style,onEachFeature:onEachFeature}).addTo(map);
 
@@ -72,6 +76,9 @@ function initBaseMap(basemapNr,initLocation){
 Object.values = obj => Object.keys(obj).map(key => obj[key]);
 
 function getRankData(id){
+	/**
+	* A function which generates the core part of the chart with the date as label and rank/ndvi as values.
+	*/
 	ranks = fieldRanks[id];
 	ndvi  = fieldNDVI[id];
 	labels= Object.keys(ranks);
@@ -103,13 +110,22 @@ function getRankData(id){
 	return data;
 }
 function getSummerRank(id){
+	/**
+	* A function to identify the rank of a field halfway in the season.
+	*/
 	ranks = fieldRanks[id]
 	length = Object.keys(ranks).length;
 	datasetsData = Object.values(ranks)	
 	return datasetsData[Math.floor(length/2)];
 }
 
+var myNewChart;
 function whenClicked(e) {
+	/**
+	* A function which is executed when clicked on a polygon
+	* This function will add the chart of the selected field
+	* And it will highlight of all the fields with the same crop type
+	*/
 	// e = event
 	var properties = e.target.feature.properties;
 	var id = properties.id;
@@ -119,11 +135,8 @@ function whenClicked(e) {
 	if (gewasL.length == 2){gewas = gewasL[1]+gewasL[0]}
 	var opp = Math.floor(properties.GEOMETRIE_Area/1000)/10; //to hectares with one decimal  
 	// You can make your ajax call declaration here
-	//$.ajax(...
 	$('#parcelInfo').html(gewas+": "+opp+" ha");
-	// console.log(gewas+": "+opp+" ha"); 
 	var ctx = $("#chartArea").get(0).getContext("2d");
-	// new Chart(ctx);
 	data = getRankData(properties.id-1);
 	var myNewChart = new Chart(ctx).Line(data, {
 	    bezierCurve: true,
@@ -137,7 +150,7 @@ function whenClicked(e) {
 	});
 	var legend = myNewChart.generateLegend();
 	$("#legend").html(legend);
-	// Undo selection info
+	// Undo highlight info
 	geojson_layer.eachLayer(function (layer) {    
 		layer.setStyle({
 			weight: 1,
@@ -145,7 +158,7 @@ function whenClicked(e) {
 			color: 'white',
 			dashArray: '3'}) 
 	});
-	//  highlight all fields with the same crop type
+	// highlight all fields with the same crop type
 	geojson_layer.eachLayer(function (layer) {  
 	if(layer.feature.properties.GWS_GEWAS == gewas_original) {    
 		layer.setStyle({
@@ -157,7 +170,11 @@ function whenClicked(e) {
 	});
 }
 
-function onEachFeature(feature,layer){// does this feature have a property named popupContent?
+function onEachFeature(feature,layer){
+	/**
+	* A function which is executed with the creation of every polygon
+	* It will add a popup and will bind the whenClicked function.
+	*/
     var id = feature.properties.id;
     var gewas = feature.properties.GWS_GEWAS;
     var gewasL= gewas.split(",");
@@ -169,6 +186,8 @@ function onEachFeature(feature,layer){// does this feature have a property named
     });
   	layer.bindPopup(gewas+": "+opp+" ha");
 }
+
+// Download the ranks json and the ndvi json
 var fieldRanks;
 $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ranksStadskanaal.json",function(json){
 	fieldRanks = json;
@@ -179,9 +198,9 @@ $.getJSON("http://gerts.github.io/NDVICropBenchmark/webpageData/ndviStadskanaal.
 	fieldNDVI = json;
 	loadPolygons();
 });
+
 //Colour scale for polygons:
 function getColor(r) {
-	// console.log(r);
 	r = parseFloat(r);
     return r > 0.999999 ? '#1a9850':
            r > 0.7 ? '#91cf60' :
@@ -189,6 +208,7 @@ function getColor(r) {
            r > 0.2 ? '#fc8d59' :
                      '#d73027';
 }
+// Style for the polygons:
 function style(feature) {
     return {
         fillColor: getColor(getSummerRank(feature.properties.id-1)),
@@ -200,14 +220,8 @@ function style(feature) {
     };
 }
 
-
 // spinner stuff:
 $body = $("body");
-
-$(document).on({
-    ajaxStart: function() { $body.addClass("loading");    },
-    ajaxStop: function() { $body.removeClass("loading"); }    
-});
 
 $(document).on({
     ajaxStart: function() { $body.addClass("loading");    },

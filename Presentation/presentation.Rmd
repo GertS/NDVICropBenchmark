@@ -26,12 +26,11 @@ output:
 
 ## Benchmarking!
 
-- Compare your fields with others 
+- Compare your fields with others
 
-## Dificulties
-
-- Crop types
-- Soil types
+- R 
+- HTML5 (Html, javascript & CSS)
+- with help of Leaflet & Chart.js
 
 # The Process
 
@@ -48,7 +47,7 @@ Basis-Registratie Percelen
 
 Global Administrative Areas
 
--subset per municipalit(y/ies)
+- subset per municipalit(y/ies)
 
 - <p></p> <div align="center"><img class="decoded" src="GADM.png" width=300 height=400></div>
 
@@ -71,11 +70,30 @@ Global Administrative Areas
 
 ## Ranking
 
-- based
+```
+NDVItable #every row has the NDVI values of 2015
+cropTypes <- unique(cropTable)
+```
 
-----
+> - for loop over all the `cropTypes` with index `i`
+> - for loop over every date with index `j`
 
-## Going to sleep
+```
+fieldIndex <- which(cropTable == cropTypes[i],)
+tempNDVItable <- NDVItable[fieldIndex][,j]
 
-- Get in bed
-- Count sheep
+tempRank <- rank(tempNDVItable),ties.method="first")/length(tempNDVItable)
+rankMatrix[fieldIndex,j] <- tempRank
+```
+
+## Exporting
+
+- Fields stored as GeoJSON
+- ranks  stored as JSON
+- ndvi   stored as JSON
+
+# The Result
+
+## Webpage
+
+[NDVI Benchmark Stadskanaal](http://gerts.github.io/NDVICropBenchmark/html/)

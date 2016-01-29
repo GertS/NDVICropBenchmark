@@ -114,14 +114,10 @@
 </article></slide><slide class=''><hgroup><h2>Benchmarking!</h2></hgroup><article  id="benchmarking">
 
 <ul class = 'build'>
-<li>Compare your fields with others</li>
-</ul>
-
-</article></slide><slide class=''><hgroup><h2>Dificulties</h2></hgroup><article  id="dificulties">
-
-<ul class = 'build'>
-<li>Crop types</li>
-<li>Soil types</li>
+<li><p>Compare your fields with others</p></li>
+<li>R</li>
+<li>HTML5 (Html, javascript &amp; CSS)</li>
+<li><p>with help of Leaflet &amp; Chart.js</p></li>
 </ul>
 
 </article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>The Process</h2></hgroup><article  id="the-process">
@@ -145,21 +141,14 @@
 
 <p>Global Administrative Areas</p>
 
-<p>-subset per municipalit(y/ies)</p>
-
 <ul class = 'build'>
+<li><p>subset per municipalit(y/ies)</p></li>
 <li><p>
 
 </p>
 
 <div align="center">
 <img class="decoded" src="GADM.png" width=300 height=400></div></li>
-</ul>
-
-</article></slide><slide class=''><hgroup><h2>NDVI</h2></hgroup><article  id="ndvi">
-
-<ul class = 'build'>
-<li><a href='https://boerenbunder.nl/#b/51.98969,5.653' title=''>Boer&amp;Bunder.nl</a></li>
 </ul>
 
 </article></slide><slide class=''><hgroup><h2>Intersect</h2></hgroup><article  id="intersect">
@@ -189,7 +178,41 @@
 <div align="center">
 <img class="decoded" src="GADM-Reality.png" width=500 height=500></div>
 
-</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+</article></slide><slide class=''><hgroup><h2>NDVI</h2></hgroup><article  id="ndvi">
+
+<ul class = 'build'>
+<li><a href='https://boerenbunder.nl/#b/51.98969,5.653' title=''>Boer&amp;Bunder.nl</a></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Ranking</h2></hgroup><article  id="ranking">
+
+<pre >NDVItable #every row has the NDVI values of 2015
+cropTypes &lt;- unique(cropTable)</pre>
+
+<ul>
+<li>for loop over all the <code>cropTypes</code> with index <code>i</code></li>
+<li>for loop over every date with index <code>j</code></li>
+</ul>
+
+<pre >fieldIndex &lt;- which(cropTable == cropTypes[i],)
+tempNDVItable &lt;- NDVItable[fieldIndex][,j]
+
+tempRank &lt;- rank(tempNDVItable),ties.method=&quot;first&quot;)/length(tempNDVItable)
+rankMatrix[fieldIndex,j] &lt;- tempRank</pre>
+
+</article></slide><slide class=''><hgroup><h2>Exporting</h2></hgroup><article  id="exporting">
+
+<ul class = 'build'>
+<li>Fields stored as GeoJSON</li>
+<li>ranks stored as JSON</li>
+<li>ndvi stored as JSON</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>The Result</h2></hgroup><article  id="the-result">
+
+</article></slide><slide class=''><hgroup><h2>Webpage</h2></hgroup><article  id="webpage">
+
+<p><a href='http://gerts.github.io/NDVICropBenchmark/html/' title=''>NDVI Benchmark Stadskanaal</a></p>
 
 </article></slide><slide class=''><hgroup><h2>Going to sleep</h2></hgroup><article  id="going-to-sleep">
 
